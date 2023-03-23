@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tv1"
+    android:textColor="@color/white"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/d_press_item_selector"
+    android:paddingHorizontal="10dp"
+    android:paddingVertical="4dp"
+    android:text="啊啊啊1" />
