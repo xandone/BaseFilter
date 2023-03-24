@@ -27,6 +27,13 @@ class FilterFragment : Fragment() {
 
     private lateinit var contentLl: LinearLayout
 
+    private var mFilterList: Array<out FilterInfo>? = null
+
+    /**
+     * 元数据的json形式
+     */
+    private var mFilterOriginalJson: String? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -64,6 +71,8 @@ class FilterFragment : Fragment() {
             filterSearch -> {
                 val view = layoutInflater.inflate(R.layout.v_filter_search, null)
                 contentLl.addView(view)
+
+                view.findViewById<TextView>(R.id.title_tv).text = filterInfo.title
                 val searchEt = view.findViewById<AppCompatEditText>(R.id.search_et)
                 searchEt.hint = filterInfo.items[1].value
                 searchEt.addTextChangedListener(object : TextWatcher {
@@ -91,7 +100,10 @@ class FilterFragment : Fragment() {
             }
             filterSearchSpinner -> {
                 val view = layoutInflater.inflate(R.layout.v_filter_search_spinner, null)
+                contentLl.addView(view)
+
                 val tv = view.findViewById<TextView>(R.id.spinner_tv)
+                view.findViewById<TextView>(R.id.title_tv).text = filterInfo.title
                 val searchEt = view.findViewById<AppCompatEditText>(R.id.search_et)
                 searchEt.hint = filterInfo.items[1].value
 
@@ -100,7 +112,6 @@ class FilterFragment : Fragment() {
                     .map {
                         it.value
                     }
-                contentLl.addView(view)
 
                 tv.setOnClickListener {
                     showPopue(tv, list.toTypedArray(), filterInfo.items)
@@ -130,8 +141,10 @@ class FilterFragment : Fragment() {
                 })
             }
             filterGrid -> {
-                val recyclerView =
-                    layoutInflater.inflate(R.layout.v_filter_grid, null) as RecyclerView
+                val view = layoutInflater.inflate(R.layout.v_filter_grid, null)
+                contentLl.addView(view)
+                view.findViewById<TextView>(R.id.title_tv).text = filterInfo.title
+                val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
                 val adapter = object : RecyclerView.Adapter<Holder>() {
                     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
                         return Holder(
@@ -148,7 +161,6 @@ class FilterFragment : Fragment() {
                         return filterInfo.items.size
                     }
                 }
-                contentLl.addView(recyclerView)
                 recyclerView.apply {
                     this.adapter = adapter
                     layoutManager = GridLayoutManager(activity, 3)
@@ -171,11 +183,11 @@ class FilterFragment : Fragment() {
         }
     }
 
-    fun removeItem() {
+    private fun removeItem() {
         contentLl.removeAllViews()
     }
 
-    fun reset() {
+    private fun reset() {
         removeItem()
         mFilterList = json2Array(mFilterOriginalJson, Array<FilterInfo>::class.java)
         mFilterList?.forEach {
@@ -193,23 +205,14 @@ class FilterFragment : Fragment() {
     private var mCallback: ((isChanged: Boolean, filterList: Array<out FilterInfo>?) -> Unit)? =
         null
 
-    fun bindItem(
-        vararg info: FilterInfo,
-        callback: (isChanged: Boolean, filterList: Array<out FilterInfo>?) -> Unit
-    ) {
-        this.mFilterList = info
-        this.mFilterOriginalJson = obj2Json(mFilterList)
 
-        this.mCallback = callback
-    }
-
+    /**
+     * 数据是否进行了操作
+     */
     private fun isChanged(): Boolean {
         val json = obj2Json(mFilterList)
         return json != mFilterOriginalJson
     }
-
-    private var mFilterList: Array<out FilterInfo>? = null
-    private var mFilterOriginalJson: String? = null
 
 
     class Holder(itemView: View, private val list: List<FilterItem>) :
@@ -248,6 +251,20 @@ class FilterFragment : Fragment() {
             }, 0, R.layout._xpopup_adapter_text)
             .show()
     }
+
+    /**
+     * 绑定视图数据
+     */
+    fun bindItem(
+        vararg info: FilterInfo,
+        callback: (isChanged: Boolean, filterList: Array<out FilterInfo>?) -> Unit
+    ) {
+        this.mFilterList = info
+        this.mFilterOriginalJson = obj2Json(mFilterList)
+
+        this.mCallback = callback
+    }
+
 
     companion object {
         fun getInstance(): FilterFragment {

@@ -23,7 +23,8 @@ class MainActivity : AppCompatActivity() {
                 mutableListOf(
                     FilterItem(id = 1, value = ""),
                     FilterItem(id = 2, value = "请输入..")
-                )
+                ),
+                "输入框标题"
             ),
             FilterInfo(
                 FilterType.filterSearchSpinner,
@@ -33,7 +34,8 @@ class MainActivity : AppCompatActivity() {
                     FilterItem(id = 3, value = "数据1"),
                     FilterItem(id = 4, value = "数据2"),
                     FilterItem(id = 5, value = "数据3")
-                )
+                ),
+                "选择框标题"
             ),
             FilterInfo(
                 FilterType.filterGrid,
@@ -42,7 +44,8 @@ class MainActivity : AppCompatActivity() {
                     FilterItem(id = 2, value = "数据2"),
                     FilterItem(id = 3, value = "数据3"),
                     FilterItem(id = 4, value = "数据4", true)
-                )
+                ),
+                "多选项标题"
             )
         ) { isChanged, filterList ->
             Log.d("tag123", "isChanged=$isChanged")
