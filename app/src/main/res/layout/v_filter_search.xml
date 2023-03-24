@@ -5,6 +5,7 @@
     android:layout_height="wrap_content">
 
     <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/search_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/d_search_et_shape"

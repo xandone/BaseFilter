@@ -1,20 +1,18 @@
 package com.xandone.basefilter.filter
 
-import android.content.Context
 import android.graphics.Rect
 import android.os.Bundle
-import android.util.Log
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.LinearLayout
-import android.widget.Spinner
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.reflect.TypeToken
 import com.lxj.xpopup.XPopup
 import com.lxj.xpopup.enums.PopupAnimation
 import com.xandone.basefilter.R
@@ -66,17 +64,70 @@ class FilterFragment : Fragment() {
             filterSearch -> {
                 val view = layoutInflater.inflate(R.layout.v_filter_search, null)
                 contentLl.addView(view)
+                val searchEt = view.findViewById<AppCompatEditText>(R.id.search_et)
+                searchEt.hint = filterInfo.items[1].value
+                searchEt.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        count: Int,
+                        after: Int
+                    ) {
+                    }
+
+                    override fun onTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        before: Int,
+                        count: Int
+                    ) {
+                    }
+
+                    override fun afterTextChanged(s: Editable?) {
+                        filterInfo.items[0].value = s.toString()
+                    }
+
+                })
             }
             filterSearchSpinner -> {
                 val view = layoutInflater.inflate(R.layout.v_filter_search_spinner, null)
                 val tv = view.findViewById<TextView>(R.id.spinner_tv)
-                val list = filterInfo.items.map {
-                    it.value
-                }
-                tv.setOnClickListener {
-                    showPopue(tv, list.toTypedArray())
-                }
+                val searchEt = view.findViewById<AppCompatEditText>(R.id.search_et)
+                searchEt.hint = filterInfo.items[1].value
+
+                val list = filterInfo.items
+                    .filterIndexed { index, _ -> index > 1 }
+                    .map {
+                        it.value
+                    }
                 contentLl.addView(view)
+
+                tv.setOnClickListener {
+                    showPopue(tv, list.toTypedArray(), filterInfo.items)
+                }
+
+                searchEt.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        count: Int,
+                        after: Int
+                    ) {
+                    }
+
+                    override fun onTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        before: Int,
+                        count: Int
+                    ) {
+                    }
+
+                    override fun afterTextChanged(s: Editable?) {
+                        filterInfo.items[0].value = s.toString()
+                    }
+
+                })
             }
             filterGrid -> {
                 val recyclerView =
@@ -132,20 +183,36 @@ class FilterFragment : Fragment() {
         }
     }
 
-    fun commit() {
-        //TODO
+    private fun commit() {
+        mCallback?.invoke(isChanged(), mFilterList)
     }
 
-    fun bindItem(vararg info: FilterInfo) {
+    /**
+     * 确定按钮回调函数
+     */
+    private var mCallback: ((isChanged: Boolean, filterList: Array<out FilterInfo>?) -> Unit)? =
+        null
+
+    fun bindItem(
+        vararg info: FilterInfo,
+        callback: (isChanged: Boolean, filterList: Array<out FilterInfo>?) -> Unit
+    ) {
         this.mFilterList = info
         this.mFilterOriginalJson = obj2Json(mFilterList)
+
+        this.mCallback = callback
+    }
+
+    private fun isChanged(): Boolean {
+        val json = obj2Json(mFilterList)
+        return json != mFilterOriginalJson
     }
 
     private var mFilterList: Array<out FilterInfo>? = null
     private var mFilterOriginalJson: String? = null
 
 
-    inner class Holder(itemView: View, private val list: List<FilterItem>) :
+    class Holder(itemView: View, private val list: List<FilterItem>) :
         RecyclerView.ViewHolder(itemView) {
 
         fun bindView(bean: FilterItem, adapter: RecyclerView.Adapter<*>) {
@@ -164,7 +231,7 @@ class FilterFragment : Fragment() {
         }
     }
 
-    private fun showPopue(tv: TextView, list: Array<String>) {
+    private fun showPopue(tv: TextView, list: Array<String>, list2: List<FilterItem>) {
         XPopup.Builder(activity)
             .isDarkTheme(false)
             .hasShadowBg(false)
@@ -172,8 +239,12 @@ class FilterFragment : Fragment() {
             .popupWidth(tv.width)
             .maxHeight(dp2px(requireActivity(), 40 * 4f))
             .popupAnimation(PopupAnimation.ScrollAlphaFromTop)
-            .asAttachList(list, null, { _, text ->
+            .asAttachList(list, null, { position, text ->
                 tv.text = text
+                list2.forEach {
+                    it.isSelect = false
+                }
+                list2[position + 2].isSelect = true
             }, 0, R.layout._xpopup_adapter_text)
             .show()
     }
@@ -182,11 +253,6 @@ class FilterFragment : Fragment() {
         fun getInstance(): FilterFragment {
             return FilterFragment()
         }
-    }
-
-    fun dp2px(context: Context, dpValue: Float): Int {
-        val scale = context.resources.displayMetrics.density
-        return (dpValue * scale + 0.5f).toInt()
     }
 
 

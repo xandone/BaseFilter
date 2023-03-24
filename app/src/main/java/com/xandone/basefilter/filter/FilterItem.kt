@@ -7,6 +7,6 @@ package com.xandone.basefilter.filter
  */
 data class FilterItem(
     val id: Int = 0,
-    val value: String,
+    var value: String,
     var isSelect: Boolean = false
 )

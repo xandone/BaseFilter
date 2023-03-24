@@ -1,12 +1,10 @@
 package com.xandone.basefilter
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.xandone.basefilter.databinding.ActMainBinding
-import com.xandone.basefilter.filter.FilterFragment
-import com.xandone.basefilter.filter.FilterInfo
-import com.xandone.basefilter.filter.FilterItem
-import com.xandone.basefilter.filter.FilterType
+import com.xandone.basefilter.filter.*
 
 /**
  * @author: xiao
@@ -23,15 +21,18 @@ class MainActivity : AppCompatActivity() {
             FilterInfo(
                 FilterType.filterSearch,
                 mutableListOf(
-                    FilterItem(id = 1, value = "数据1"),
-                    FilterItem(id = 2, value = "数据2")
+                    FilterItem(id = 1, value = ""),
+                    FilterItem(id = 2, value = "请输入..")
                 )
             ),
             FilterInfo(
                 FilterType.filterSearchSpinner,
                 mutableListOf(
-                    FilterItem(id = 1, value = "数据1"),
-                    FilterItem(id = 2, value = "数据2")
+                    FilterItem(id = 1, value = ""),
+                    FilterItem(id = 2, value = "请输入.."),
+                    FilterItem(id = 3, value = "数据1"),
+                    FilterItem(id = 4, value = "数据2"),
+                    FilterItem(id = 5, value = "数据3")
                 )
             ),
             FilterInfo(
@@ -39,11 +40,14 @@ class MainActivity : AppCompatActivity() {
                 mutableListOf(
                     FilterItem(id = 1, value = "数据1"),
                     FilterItem(id = 2, value = "数据2"),
-                    FilterItem(id = 2, value = "数据3"),
-                    FilterItem(id = 2, value = "数据4", true)
+                    FilterItem(id = 3, value = "数据3"),
+                    FilterItem(id = 4, value = "数据4", true)
                 )
             )
-        )
+        ) { isChanged, filterList ->
+            Log.d("tag123", "isChanged=$isChanged")
+            Log.d("tag123", "filterList=${obj2Json(filterList)}")
+        }
         supportFragmentManager.beginTransaction().add(R.id.drawer_content, fragment)
             .commitAllowingStateLoss()
     }
