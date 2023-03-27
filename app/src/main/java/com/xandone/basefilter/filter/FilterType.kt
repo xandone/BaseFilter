@@ -9,9 +9,9 @@ package com.xandone.basefilter.filter
 
 
 enum class FilterType {
-    filterSearch,
-    filterSearchSpinner,
-    filterGrid
+    FilterSearch,
+    FilterSearchSpinner,
+    FilterGrid
 }
 
 

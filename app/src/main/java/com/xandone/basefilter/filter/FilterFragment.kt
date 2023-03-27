@@ -27,12 +27,27 @@ class FilterFragment : Fragment() {
 
     private lateinit var contentLl: LinearLayout
 
+    /**
+     * 元数据
+     */
     private var mFilterList: Array<out FilterInfo>? = null
 
     /**
      * 元数据的json形式
      */
     private var mFilterOriginalJson: String? = null
+
+    /**
+     * 确定按钮回调函数
+     */
+    private var mCommitCallback: ((isChanged: Boolean, filterList: Array<out FilterInfo>?) -> Unit)? =
+        null
+
+    /**
+     * 重置按钮回调函数
+     */
+    private var mResetCallback: (() -> Unit)? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,7 +83,7 @@ class FilterFragment : Fragment() {
 
     private fun addItem(filterInfo: FilterInfo) {
         when (filterInfo.type) {
-            filterSearch -> {
+            FilterSearch -> {
                 val view = layoutInflater.inflate(R.layout.v_filter_search, null)
                 contentLl.addView(view)
 
@@ -98,7 +113,7 @@ class FilterFragment : Fragment() {
 
                 })
             }
-            filterSearchSpinner -> {
+            FilterSearchSpinner -> {
                 val view = layoutInflater.inflate(R.layout.v_filter_search_spinner, null)
                 contentLl.addView(view)
 
@@ -140,7 +155,7 @@ class FilterFragment : Fragment() {
 
                 })
             }
-            filterGrid -> {
+            FilterGrid -> {
                 val view = layoutInflater.inflate(R.layout.v_filter_grid, null)
                 contentLl.addView(view)
                 view.findViewById<TextView>(R.id.title_tv).text = filterInfo.title
@@ -193,17 +208,12 @@ class FilterFragment : Fragment() {
         mFilterList?.forEach {
             addItem(it)
         }
+        mResetCallback?.invoke()
     }
 
     private fun commit() {
-        mCallback?.invoke(isChanged(), mFilterList)
+        mCommitCallback?.invoke(isChanged(), mFilterList)
     }
-
-    /**
-     * 确定按钮回调函数
-     */
-    private var mCallback: ((isChanged: Boolean, filterList: Array<out FilterInfo>?) -> Unit)? =
-        null
 
 
     /**
@@ -255,16 +265,24 @@ class FilterFragment : Fragment() {
     /**
      * 绑定视图数据
      */
-    fun bindItem(
-        vararg info: FilterInfo,
-        callback: (isChanged: Boolean, filterList: Array<out FilterInfo>?) -> Unit
-    ) {
+    fun bindItem(vararg info: FilterInfo): FilterFragment {
         this.mFilterList = info
         this.mFilterOriginalJson = obj2Json(mFilterList)
-
-        this.mCallback = callback
+        return this
     }
 
+
+    fun bindCommitCallBack(
+        callback: (isChanged: Boolean, filterList: Array<out FilterInfo>?) -> Unit
+    ): FilterFragment {
+        this.mCommitCallback = callback
+        return this
+    }
+
+    fun bindResetCallback(callback: () -> Unit): FilterFragment {
+        this.mResetCallback = callback
+        return this
+    }
 
     companion object {
         fun getInstance(): FilterFragment {

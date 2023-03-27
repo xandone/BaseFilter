@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         val fragment = FilterFragment.getInstance()
         fragment.bindItem(
             FilterInfo(
-                FilterType.filterSearch,
+                FilterType.FilterSearch,
                 mutableListOf(
                     FilterItem(id = 1, value = ""),
                     FilterItem(id = 2, value = "请输入..")
@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
                 "输入框标题"
             ),
             FilterInfo(
-                FilterType.filterSearchSpinner,
+                FilterType.FilterSearchSpinner,
                 mutableListOf(
                     FilterItem(id = 1, value = ""),
                     FilterItem(id = 2, value = "请输入.."),
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
                 "选择框标题"
             ),
             FilterInfo(
-                FilterType.filterGrid,
+                FilterType.FilterGrid,
                 mutableListOf(
                     FilterItem(id = 1, value = "数据1"),
                     FilterItem(id = 2, value = "数据2"),
@@ -47,10 +47,13 @@ class MainActivity : AppCompatActivity() {
                 ),
                 "多选项标题"
             )
-        ) { isChanged, filterList ->
+        ).bindCommitCallBack { isChanged, filterList ->
             Log.d("tag123", "isChanged=$isChanged")
             Log.d("tag123", "filterList=${obj2Json(filterList)}")
+        }.bindResetCallback {
+            Log.d("tag123", "重置..")
         }
+
         supportFragmentManager.beginTransaction().add(R.id.drawer_content, fragment)
             .commitAllowingStateLoss()
     }
