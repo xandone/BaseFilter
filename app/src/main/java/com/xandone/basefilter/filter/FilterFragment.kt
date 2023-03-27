@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.LayoutRes
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -48,6 +49,15 @@ class FilterFragment : Fragment() {
      */
     private var mResetCallback: (() -> Unit)? = null
 
+    @LayoutRes
+    private var vFilterSearch: Int = R.layout.v_filter_search
+
+    @LayoutRes
+    private var vFilterSearchSpinner: Int = R.layout.v_filter_search_spinner
+
+    @LayoutRes
+    private var vFilterGrid: Int = R.layout.v_filter_grid
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -84,7 +94,7 @@ class FilterFragment : Fragment() {
     private fun addItem(filterInfo: FilterInfo) {
         when (filterInfo.type) {
             FilterSearch -> {
-                val view = layoutInflater.inflate(R.layout.v_filter_search, null)
+                val view = layoutInflater.inflate(vFilterSearch, null)
                 contentLl.addView(view)
 
                 view.findViewById<TextView>(R.id.title_tv).text = filterInfo.title
@@ -114,7 +124,7 @@ class FilterFragment : Fragment() {
                 })
             }
             FilterSearchSpinner -> {
-                val view = layoutInflater.inflate(R.layout.v_filter_search_spinner, null)
+                val view = layoutInflater.inflate(vFilterSearchSpinner, null)
                 contentLl.addView(view)
 
                 val tv = view.findViewById<TextView>(R.id.spinner_tv)
@@ -156,7 +166,7 @@ class FilterFragment : Fragment() {
                 })
             }
             FilterGrid -> {
-                val view = layoutInflater.inflate(R.layout.v_filter_grid, null)
+                val view = layoutInflater.inflate(vFilterGrid, null)
                 contentLl.addView(view)
                 view.findViewById<TextView>(R.id.title_tv).text = filterInfo.title
                 val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
@@ -272,16 +282,32 @@ class FilterFragment : Fragment() {
     }
 
 
-    fun bindCommitCallBack(
+    fun setCommitCallBack(
         callback: (isChanged: Boolean, filterList: Array<out FilterInfo>?) -> Unit
     ): FilterFragment {
         this.mCommitCallback = callback
         return this
     }
 
-    fun bindResetCallback(callback: () -> Unit): FilterFragment {
+    fun setResetCallback(callback: () -> Unit): FilterFragment {
         this.mResetCallback = callback
         return this
+    }
+
+
+    /**
+     * 修改布局
+     */
+    fun changeResLayout(type: FilterType, @LayoutRes layoutId: Int): FilterFragment {
+
+        when (type) {
+            FilterSearch -> vFilterSearch = layoutId
+            FilterSearchSpinner -> vFilterSearchSpinner = layoutId
+            FilterGrid -> vFilterGrid = layoutId
+        }
+
+        return this
+
     }
 
     companion object {

@@ -47,12 +47,13 @@ class MainActivity : AppCompatActivity() {
                 ),
                 "多选项标题"
             )
-        ).bindCommitCallBack { isChanged, filterList ->
-            Log.d("tag123", "isChanged=$isChanged")
-            Log.d("tag123", "filterList=${obj2Json(filterList)}")
-        }.bindResetCallback {
-            Log.d("tag123", "重置..")
-        }
+        ).changeResLayout(FilterType.FilterSearch, R.layout.v_filter_search2)
+            .setCommitCallBack { isChanged, filterList ->
+                Log.d("tag123", "isChanged=$isChanged")
+                Log.d("tag123", "filterList=${obj2Json(filterList)}")
+            }.setResetCallback {
+                Log.d("tag123", "重置..")
+            }
 
         supportFragmentManager.beginTransaction().add(R.id.drawer_content, fragment)
             .commitAllowingStateLoss()
